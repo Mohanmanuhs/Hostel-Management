@@ -33,19 +33,19 @@ public class Hostel {
     @Column
     private String phone;
 
-    @OneToMany(mappedBy = "hostel", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(mappedBy = "hostel", cascade = CascadeType.REMOVE)
     private List<Application> applications;
 
-    @OneToMany(mappedBy = "hostel", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(mappedBy = "hostel", cascade = CascadeType.REFRESH)
     private List<Staff> staffs;
 
-    @OneToMany(mappedBy = "hostel", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(mappedBy = "hostel", cascade = CascadeType.REMOVE)
     private List<Room> rooms;
 
-    @OneToMany(mappedBy = "hostel", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(mappedBy = "hostel", cascade = CascadeType.REFRESH)
     private List<FeesPayment> feesPayments;
 
-    @OneToOne(mappedBy = "hostel", cascade = CascadeType.ALL)
+    @OneToOne(mappedBy = "hostel", cascade = CascadeType.REMOVE)
     private Food food;
 
 }

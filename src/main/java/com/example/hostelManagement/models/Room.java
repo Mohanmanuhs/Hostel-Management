@@ -2,6 +2,8 @@ package com.example.hostelManagement.models;
 
 import jakarta.persistence.*;
 import lombok.*;
+import org.hibernate.annotations.OnDelete;
+import org.hibernate.annotations.OnDeleteAction;
 
 import java.util.List;
 
@@ -29,9 +31,10 @@ public class Room {
 
     @ManyToOne
     @JoinColumn(name = "hostel_id", nullable = false)
+    @OnDelete(action = OnDeleteAction.CASCADE)
     private Hostel hostel;
 
-    @OneToMany(mappedBy = "room", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(mappedBy = "room", cascade = CascadeType.REFRESH)
     private List<Student> students;
 
 }
