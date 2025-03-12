@@ -23,9 +23,12 @@ public class HostelDto {
     private String name;
 
     @NotBlank(message = "hostel address may not be blank")
-    private String address;
+    private String location;
 
     @NotBlank(message = "hostel phone no. may not be blank")
     private String phone;
 
+    @NotNull(message = "fees must not be null")
+    @Min(0)
+    private Integer fees;
 }

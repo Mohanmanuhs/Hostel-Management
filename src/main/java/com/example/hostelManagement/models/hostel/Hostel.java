@@ -51,7 +51,7 @@ public class Hostel {
     @OneToMany(mappedBy = "hostel", cascade = CascadeType.REFRESH)
     private List<FeesPayment> feesPayments = new ArrayList<>();
 
-    @OneToOne(mappedBy = "hostel", cascade = CascadeType.REMOVE)
-    private Food food = new Food();
+    @OneToOne(mappedBy = "hostel", cascade = CascadeType.ALL, orphanRemoval = true)
+    private Food food;
 
 }

@@ -23,7 +23,7 @@ public class RoomService {
 
     public void createRoomsForFixedSize(int floorNo, int totalRooms, int startRoomNo, Hostel hostel, int totalSeatsInEachRoom) {
         int i = startRoomNo;
-        while (i <= startRoomNo + totalRooms) {
+        while (i < startRoomNo + totalRooms) {
             Room room = new Room();
             room.setRoom_no(i);
             room.setHostel(hostel);
