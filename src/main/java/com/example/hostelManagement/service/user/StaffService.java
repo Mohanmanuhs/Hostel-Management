@@ -15,7 +15,7 @@ public class StaffService {
     @Autowired
     private StaffRepo staffRepo;
 
-    public User createStudent(Staff staff) {
+    public User createStaff(Staff staff) {
         return staffRepo.save(staff);
     }
 

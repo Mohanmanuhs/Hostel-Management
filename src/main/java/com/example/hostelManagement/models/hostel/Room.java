@@ -36,7 +36,7 @@ public class Room {
     @OnDelete(action = OnDeleteAction.CASCADE)
     private Hostel hostel = new Hostel();
 
-    @OneToMany(mappedBy = "room", cascade = CascadeType.REFRESH)
+    @OneToMany(mappedBy = "room", cascade = {CascadeType.PERSIST, CascadeType.MERGE})
     private List<Student> students = new ArrayList<>();
 
 }

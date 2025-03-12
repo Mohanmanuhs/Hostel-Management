@@ -22,13 +22,13 @@ public class Application {
     @ManyToOne
     @JoinColumn(name = "student_id")
     @MapsId("studentId")
-    @OnDelete(action = OnDeleteAction.SET_NULL)
+    @OnDelete(action = OnDeleteAction.CASCADE)
     private Student student;
 
     @ManyToOne
     @JoinColumn(name = "hostel_id")
     @MapsId("hostelId")
-    @OnDelete(action = OnDeleteAction.SET_NULL)
+    @OnDelete(action = OnDeleteAction.CASCADE)
     private Hostel hostel;
 
     @Enumerated(EnumType.STRING)

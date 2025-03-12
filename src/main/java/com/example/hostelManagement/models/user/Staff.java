@@ -2,7 +2,10 @@ package com.example.hostelManagement.models.user;
 
 import com.example.hostelManagement.constants.Position;
 import com.example.hostelManagement.models.hostel.Hostel;
-import jakarta.persistence.*;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
 import lombok.*;
 import org.hibernate.annotations.OnDelete;
 import org.hibernate.annotations.OnDeleteAction;
@@ -21,6 +24,6 @@ public class Staff extends User {
     @ManyToOne
     @JoinColumn(name = "hostel_id")
     @OnDelete(action = OnDeleteAction.SET_NULL)
-    private Hostel hostel;
+    private Hostel hostel = null;
 
 }

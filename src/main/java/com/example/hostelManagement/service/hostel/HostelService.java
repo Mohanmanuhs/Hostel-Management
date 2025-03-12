@@ -39,7 +39,7 @@ public class HostelService {
         if (filterBy.equalsIgnoreCase("location")) {
             return hostelRepo.findByLocationContainingIgnoreCase(filterName);
         } else if (filterBy.equalsIgnoreCase("fees")) {
-            return hostelRepo.findByFeesLesserThan(Integer.valueOf(filterName));
+            return hostelRepo.findByFeesLessThan(Integer.valueOf(filterName));
         } else if (filterBy.equalsIgnoreCase("name")){
             return hostelRepo.findByNameContainingIgnoreCase(filterName);
         }else{

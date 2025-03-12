@@ -8,6 +8,7 @@ import lombok.*;
 import org.hibernate.annotations.OnDelete;
 import org.hibernate.annotations.OnDeleteAction;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @NoArgsConstructor
@@ -21,12 +22,12 @@ public class Student extends User {
     @ManyToOne
     @JoinColumn(name = "room_id")
     @OnDelete(action = OnDeleteAction.SET_NULL)
-    private Room room;
+    private Room room = null;
 
     @OneToMany(mappedBy = "student", cascade = CascadeType.REFRESH)
-    private List<Application> applications;
+    private List<Application> applications = new ArrayList<>();
 
     @OneToMany(mappedBy = "student", cascade = CascadeType.REFRESH)
-    private List<FeesPayment> feesPayments;
+    private List<FeesPayment> feesPayments = new ArrayList<>();
 
 }

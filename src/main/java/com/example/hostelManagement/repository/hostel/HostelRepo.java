@@ -13,6 +13,6 @@ public interface HostelRepo extends JpaRepository<Hostel,Integer> {
 
     List<Hostel> findByLocationContainingIgnoreCase(String location);
 
-    List<Hostel> findByFeesLesserThan(Integer fees);
+    List<Hostel> findByFeesLessThan(Integer fees);
 
 }

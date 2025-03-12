@@ -1,5 +1,6 @@
 package com.example.hostelManagement.models;
 
+import com.example.hostelManagement.constants.PaymentStatus;
 import com.example.hostelManagement.models.hostel.Hostel;
 import com.example.hostelManagement.models.user.Student;
 import jakarta.persistence.*;
@@ -13,11 +14,11 @@ import org.hibernate.annotations.OnDeleteAction;
 @Setter
 @ToString
 @Entity
-@Table(uniqueConstraints = @UniqueConstraint(columnNames = {"student", "hostel", "year"}))
+@Table(uniqueConstraints = @UniqueConstraint(columnNames = {"student_id", "hostel_id", "year"}))
 public class FeesPayment {
 
     @Id
-    private Integer transactionId;
+    private String transactionId;
 
     @ManyToOne
     @JoinColumn(name = "student_id")
@@ -32,5 +33,7 @@ public class FeesPayment {
     private Integer year;
 
     private Integer amount;
+
+    private PaymentStatus paymentStatus = PaymentStatus.PENDING;
 
 }

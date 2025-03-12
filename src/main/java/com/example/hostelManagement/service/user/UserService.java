@@ -14,13 +14,14 @@ public class UserService {
     private UserRepo userRepo;
 
 
-    public void createUser(User user) {
-        userRepo.save(user);
+    public User createUser(User user) {
+        return userRepo.save(user);
     }
 
-    public void changePassword(ChangePassDto changePassDto) {
+    public User changePassword(ChangePassDto changePassDto) {
         User user = userRepo.findByEmail(changePassDto.getEmail());
-
+        user.setPassword(changePassDto.getNewPassword());
+        return userRepo.save(user);
     }
 
     public User updateUser(User user) {

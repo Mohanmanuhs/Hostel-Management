@@ -13,8 +13,11 @@ import org.hibernate.annotations.OnDeleteAction;
 @Entity
 public class Food {
 
+    @Id
+    private Integer food_id;
+
     @OneToOne
-    @JoinColumn(name = "hostel_id", nullable = false)
+    @JoinColumn(name = "hostel_id")
     @MapsId
     @OnDelete(action = OnDeleteAction.CASCADE)
     private Hostel hostel;
