@@ -1,10 +1,8 @@
-package com.example.hostelManagement.models;
+package com.example.hostelManagement.models.user;
 
 import com.example.hostelManagement.constants.Role;
 import jakarta.persistence.*;
 import lombok.*;
-
-import java.time.LocalDateTime;
 
 @NoArgsConstructor
 @AllArgsConstructor

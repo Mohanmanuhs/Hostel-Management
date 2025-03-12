@@ -1,5 +1,8 @@
-package com.example.hostelManagement.models;
+package com.example.hostelManagement.models.user;
 
+import com.example.hostelManagement.models.Application;
+import com.example.hostelManagement.models.FeesPayment;
+import com.example.hostelManagement.models.hostel.Room;
 import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.annotations.OnDelete;

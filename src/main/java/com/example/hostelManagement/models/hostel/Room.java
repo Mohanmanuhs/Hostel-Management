@@ -1,10 +1,12 @@
-package com.example.hostelManagement.models;
+package com.example.hostelManagement.models.hostel;
 
+import com.example.hostelManagement.models.user.Student;
 import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.annotations.OnDelete;
 import org.hibernate.annotations.OnDeleteAction;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @NoArgsConstructor
@@ -32,9 +34,9 @@ public class Room {
     @ManyToOne
     @JoinColumn(name = "hostel_id", nullable = false)
     @OnDelete(action = OnDeleteAction.CASCADE)
-    private Hostel hostel;
+    private Hostel hostel = new Hostel();
 
     @OneToMany(mappedBy = "room", cascade = CascadeType.REFRESH)
-    private List<Student> students;
+    private List<Student> students = new ArrayList<>();
 
 }

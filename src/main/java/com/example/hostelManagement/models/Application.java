@@ -1,12 +1,12 @@
 package com.example.hostelManagement.models;
 
 import com.example.hostelManagement.constants.Status;
+import com.example.hostelManagement.models.hostel.Hostel;
+import com.example.hostelManagement.models.user.Student;
 import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.annotations.OnDelete;
 import org.hibernate.annotations.OnDeleteAction;
-
-import java.util.Date;
 
 @NoArgsConstructor
 @AllArgsConstructor
