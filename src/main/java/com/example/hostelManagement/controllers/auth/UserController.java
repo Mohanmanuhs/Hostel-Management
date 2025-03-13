@@ -1,12 +1,14 @@
-package com.example.hostelManagement.controllers.user;
+package com.example.hostelManagement.controllers.auth;
 
 
 import com.example.hostelManagement.dto.ChangePassDto;
 import com.example.hostelManagement.dto.UserLoginRequest;
 import com.example.hostelManagement.dto.UserRegisterRequest;
+import com.example.hostelManagement.models.auth.UserPrincipal;
 import com.example.hostelManagement.models.user.Staff;
 import com.example.hostelManagement.models.user.Student;
 import com.example.hostelManagement.models.user.User;
+import com.example.hostelManagement.service.auth.JwtService;
 import com.example.hostelManagement.service.user.StaffService;
 import com.example.hostelManagement.service.user.StudentService;
 import com.example.hostelManagement.service.user.UserService;
@@ -15,11 +17,15 @@ import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
-import org.springframework.validation.BindingResult;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.AuthenticationException;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
-import java.util.Objects;
+import java.util.InputMismatchException;
 
 @RestController
 @RequestMapping("user")
@@ -34,9 +40,14 @@ public class UserController {
     @Autowired
     private StudentService studentService;
 
+    @Autowired
+    private JwtService jwtService;
+
+    @Autowired
+    AuthenticationManager authenticationManager;
+
     @PostMapping("/register")
     public ResponseEntity<?> register(@RequestBody @Valid UserRegisterRequest userRequest) {
-        System.out.println("userRequest: " + userRequest);
         if (userService.findByEmail(userRequest.getEmail()) != null) {
             return ResponseEntity.ok("already registered user");
         }
@@ -61,37 +72,71 @@ public class UserController {
     }
 
     @PostMapping("/login")
-    public ResponseEntity<?> login(@RequestBody @Valid UserLoginRequest userRequest) {
+    public ResponseEntity<?> login(@RequestBody @Valid UserLoginRequest userRequest,HttpServletResponse response) {
 
         User user = userService.findByEmail(userRequest.getEmail());
 
         if (user == null) {
             return ResponseEntity.ok("user not found");
         }
-        return ResponseEntity.ok(user);
+        try {
+            Authentication authentication = authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(userRequest.getEmail(), userRequest.getPassword()));
+
+            if (authentication.isAuthenticated()) {
+                String token = jwtService.generateToken(userRequest.getEmail());
+                Cookie cookie = new Cookie("jwt", token);
+                cookie.setHttpOnly(true);
+                cookie.setSecure(true);
+                cookie.setPath("/");
+                cookie.setMaxAge(7 * 24 * 60 * 60);
+                response.addCookie(cookie);
+                return ResponseEntity.ok(user);
+            }
+        } catch (AuthenticationException ex) {
+            return ResponseEntity.ok("error: " + ex.getMessage());
+        }
+        return ResponseEntity.ok("password not match");
     }
 
     @GetMapping("/logout")
-    public String logout() {
-        return "logout successfully";
+    public ResponseEntity<String> logout(HttpServletResponse response) {
+        Cookie cookie = new Cookie("jwt", null);
+        cookie.setHttpOnly(true);
+        cookie.setSecure(true);
+        cookie.setPath("/");
+        cookie.setMaxAge(0);
+
+        response.addCookie(cookie);
+        return ResponseEntity.ok("logout successful");
     }
 
     @PostMapping("/changePassword")
-    public ResponseEntity<User> changePassword(@RequestBody @Valid ChangePassDto changePassDto) {
-        User user = userService.changePassword(changePassDto);
-        return ResponseEntity.ok(user);
+    public ResponseEntity<?> changePassword(@RequestBody @Valid ChangePassDto changePassDto) {
+        try {
+            userService.changePassword(changePassDto);
+            return ResponseEntity.ok("password changed");
+        } catch (UsernameNotFoundException e) {
+            return ResponseEntity.ok("user not found");
+        } catch (InputMismatchException e) {
+            return ResponseEntity.ok("password do not match");
+        }
     }
 
     @DeleteMapping("/delete")
-    public ResponseEntity<String> deleteUser(@RequestBody @Valid UserLoginRequest userRequest) {
-        User user = userService.findByEmail(userRequest.getEmail());
-        if (user == null) {
-            return ResponseEntity.ok("user not found");
-        }
-        if (!Objects.equals(user.getPassword(), userRequest.getPassword())) {
-            return ResponseEntity.ok("incorrect password");
-        }
-        userService.deleteUserByEmail(userRequest.getEmail());
+    public ResponseEntity<String> deleteUser(HttpServletResponse response) {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        UserPrincipal userDetails = (UserPrincipal) authentication.getPrincipal();
+
+        String email = userDetails.getUsername();
+
+        userService.deleteUserByEmail(email);
+        Cookie cookie = new Cookie("jwt", null);
+        cookie.setHttpOnly(true);
+        cookie.setSecure(true);
+        cookie.setPath("/");
+        cookie.setMaxAge(0);
+
+        response.addCookie(cookie);
         return ResponseEntity.ok("user deleted");
     }
 

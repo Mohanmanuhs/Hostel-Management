@@ -5,7 +5,11 @@ import com.example.hostelManagement.dto.ChangePassDto;
 import com.example.hostelManagement.models.user.User;
 import com.example.hostelManagement.repository.user.UserRepo;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
+
+import java.util.InputMismatchException;
 
 @Service
 public class UserService {
@@ -14,14 +18,23 @@ public class UserService {
     private UserRepo userRepo;
 
 
-    public User createUser(User user) {
-        return userRepo.save(user);
+    private BCryptPasswordEncoder encoder = new BCryptPasswordEncoder(12);
+
+
+    public void createUser(User user) {
+        user.setPassword(encoder.encode(user.getPassword()));
+        userRepo.save(user);
     }
 
-    public User changePassword(ChangePassDto changePassDto) {
+    public void changePassword(ChangePassDto changePassDto) {
         User user = userRepo.findByEmail(changePassDto.getEmail());
-        user.setPassword(changePassDto.getNewPassword());
-        return userRepo.save(user);
+        if (user == null) {
+            throw new UsernameNotFoundException("user with this email not found");
+        } else if (!encoder.matches(changePassDto.getOldPassword(), user.getPassword())) {
+            throw new InputMismatchException("password don't match old password");
+        }
+        user.setPassword(encoder.encode(changePassDto.getNewPassword()));
+        userRepo.save(user);
     }
 
     public User updateUser(User user) {

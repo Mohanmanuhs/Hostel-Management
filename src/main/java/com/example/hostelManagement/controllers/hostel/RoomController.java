@@ -13,10 +13,7 @@ import com.example.hostelManagement.service.hostel.RoomService;
 import com.example.hostelManagement.service.user.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.Optional;
 
@@ -55,7 +52,7 @@ public class RoomController {
         return ResponseEntity.ok("rooms created successfully");
     }
 
-    @PostMapping
+    @PostMapping("/addStudent")
     public ResponseEntity<?> addStudentToRoom(@RequestBody StdToRoomDto stdToRoomDto) {
         Optional<Room> room = roomService.getRoom(stdToRoomDto.getRoom_id());
         User user = userService.findById(stdToRoomDto.getStd_id());
@@ -63,7 +60,7 @@ public class RoomController {
         return ResponseEntity.ok("added successfully");
     }
 
-    @PostMapping
+    @DeleteMapping("/removeStudent")
     public ResponseEntity<?> removeStudentToRoom(@RequestBody StdToRoomDto stdToRoomDto) {
         User user = userService.findById(stdToRoomDto.getStd_id());
         roomService.removeStudentFromRoom(user.getId());
