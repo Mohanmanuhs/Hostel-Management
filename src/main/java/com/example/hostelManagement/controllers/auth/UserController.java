@@ -1,6 +1,7 @@
 package com.example.hostelManagement.controllers.auth;
 
 
+import com.example.hostelManagement.constants.Role;
 import com.example.hostelManagement.dto.ChangePassDto;
 import com.example.hostelManagement.dto.UserLoginRequest;
 import com.example.hostelManagement.dto.UserRegisterRequest;
@@ -16,6 +17,7 @@ import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -26,6 +28,7 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.InputMismatchException;
+import java.util.Map;
 
 @RestController
 @RequestMapping("user")
@@ -49,7 +52,7 @@ public class UserController {
     @PostMapping("/register")
     public ResponseEntity<?> register(@RequestBody @Valid UserRegisterRequest userRequest) {
         if (userService.findByEmail(userRequest.getEmail()) != null) {
-            return ResponseEntity.ok("already registered user");
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("already registered user");
         }
 
         try {
@@ -67,18 +70,18 @@ public class UserController {
             userService.createUser(user);
             return ResponseEntity.ok(user);
         } catch (Exception e) {
-            return ResponseEntity.ok(e.getMessage());
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
         }
     }
 
     @PostMapping("/login")
     public ResponseEntity<?> login(@RequestBody @Valid UserLoginRequest userRequest,HttpServletResponse response) {
-
         User user = userService.findByEmail(userRequest.getEmail());
 
         if (user == null) {
-            return ResponseEntity.ok("user not found");
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("user not found");
         }
+
         try {
             Authentication authentication = authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(userRequest.getEmail(), userRequest.getPassword()));
 
@@ -90,12 +93,14 @@ public class UserController {
                 cookie.setPath("/");
                 cookie.setMaxAge(7 * 24 * 60 * 60);
                 response.addCookie(cookie);
-                return ResponseEntity.ok(user);
+                return ResponseEntity.ok(Map.of(
+                        "role", user.getRole()
+                ));
             }
         } catch (AuthenticationException ex) {
-            return ResponseEntity.ok("error: " + ex.getMessage());
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("error: " + ex.getMessage());
         }
-        return ResponseEntity.ok("password not match");
+        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("password not match");
     }
 
     @GetMapping("/logout")
@@ -112,13 +117,18 @@ public class UserController {
 
     @PostMapping("/changePassword")
     public ResponseEntity<?> changePassword(@RequestBody @Valid ChangePassDto changePassDto) {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        UserPrincipal userDetails = (UserPrincipal) authentication.getPrincipal();
+
+        String email = userDetails.getUsername();
+        changePassDto.setEmail(email);
         try {
             userService.changePassword(changePassDto);
             return ResponseEntity.ok("password changed");
         } catch (UsernameNotFoundException e) {
-            return ResponseEntity.ok("user not found");
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("user not found");
         } catch (InputMismatchException e) {
-            return ResponseEntity.ok("password do not match");
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("password do not match");
         }
     }
 
@@ -139,6 +149,39 @@ public class UserController {
         response.addCookie(cookie);
         return ResponseEntity.ok("user deleted");
     }
+
+    @GetMapping("/getUserMode")
+    public ResponseEntity<?> getUserCapability() {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        if (authentication.getPrincipal() instanceof UserPrincipal) {
+            UserPrincipal userDetails = (UserPrincipal) authentication.getPrincipal();
+            String email = userDetails.getUsername();
+            User user = userService.findByEmail(email);
+
+            if (user != null) {
+                if (user.getRole() == Role.STUDENT) {
+                    Student student = (Student) user;
+                    if(student.getRoom()==null) {
+                        return ResponseEntity.ok("STUDENT");
+                    }else{
+                        return ResponseEntity.ok("USTUDENT");
+                    }
+                } else if (user.getRole() == Role.STAFF) {
+                    Staff staff = (Staff) user;
+                    if(staff.getHostel()==null) {
+                        return ResponseEntity.ok("STAFF");
+                    }else{
+                        return ResponseEntity.ok("USTAFF");
+                    }
+                }
+            }
+        } else{
+            return ResponseEntity.ok("USER");
+        }
+        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("bad request");
+    }
+
+
 
     private static Staff getStaff(UserRegisterRequest userRequest) {
         Staff staff = new Staff();

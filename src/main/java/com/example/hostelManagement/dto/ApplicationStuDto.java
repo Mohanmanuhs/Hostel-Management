@@ -1,5 +1,6 @@
 package com.example.hostelManagement.dto;
 
+import com.example.hostelManagement.constants.Status;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
@@ -9,12 +10,11 @@ import lombok.NoArgsConstructor;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class FeesPaymentDto {
+public class ApplicationStuDto {
 
-    @NotNull(message = "amount must not be null")
-    private Integer amount;
+    @NotBlank(message = "hostelName must not be blank")
+    private String hostelName;
 
-    @NotBlank(message = "transaction_id must not be null")
-    private String transaction_id;
-
+    @NotNull(message = "std_id must not be null")
+    private Status status;
 }

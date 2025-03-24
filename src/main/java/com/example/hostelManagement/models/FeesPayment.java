@@ -3,10 +3,13 @@ package com.example.hostelManagement.models;
 import com.example.hostelManagement.constants.PaymentStatus;
 import com.example.hostelManagement.models.hostel.Hostel;
 import com.example.hostelManagement.models.user.Student;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.annotations.OnDelete;
 import org.hibernate.annotations.OnDeleteAction;
+
+import java.time.LocalDate;
 
 @NoArgsConstructor
 @AllArgsConstructor
@@ -23,14 +26,16 @@ public class FeesPayment {
     @ManyToOne
     @JoinColumn(name = "student_id")
     @OnDelete(action = OnDeleteAction.SET_NULL)
+    @JsonManagedReference
     private Student student;
 
     @ManyToOne
     @JoinColumn(name = "hostel_id")
     @OnDelete(action = OnDeleteAction.SET_NULL)
+    @JsonManagedReference
     private Hostel hostel;
 
-    private Integer year;
+    private LocalDate year;
 
     private Integer amount;
 

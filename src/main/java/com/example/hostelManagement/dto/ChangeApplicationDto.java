@@ -11,9 +11,9 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public class ChangeApplicationDto {
 
-    @NotNull(message = "hostel_id must not be null")
+    @NotNull(message = "applicationId must not be null")
     private Integer applicationId;
 
-    @NotNull(message = "std_id must not be null")
+    @NotNull(message = "status must not be null")
     private Status status;
 }

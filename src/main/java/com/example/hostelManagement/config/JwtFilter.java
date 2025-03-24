@@ -69,6 +69,7 @@ public class JwtFilter extends OncePerRequestFilter {
             response.addCookie(cookie);
             response.sendRedirect("/api/auth/sessionExpired");
         } catch (Exception e) {
+            System.out.println("i am here");
             System.out.println("JWT Error: " + e.getMessage());
         }
     }

@@ -2,6 +2,7 @@ package com.example.hostelManagement.models.user;
 
 import com.example.hostelManagement.constants.Position;
 import com.example.hostelManagement.models.hostel.Hostel;
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.JoinColumn;
@@ -24,6 +25,7 @@ public class Staff extends User {
     @ManyToOne
     @JoinColumn(name = "hostel_id")
     @OnDelete(action = OnDeleteAction.SET_NULL)
-    private Hostel hostel = null;
+    @JsonBackReference
+    private Hostel hostel;
 
 }

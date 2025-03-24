@@ -23,6 +23,4 @@ public class RoomVariableDto {
     @Min(0)
     private Integer totalSeatsInRoom;
 
-    @NotNull(message = "hostel_id must not be null")
-    private Integer hostel_id;
 }

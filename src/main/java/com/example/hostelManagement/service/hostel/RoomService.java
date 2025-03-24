@@ -1,6 +1,7 @@
 package com.example.hostelManagement.service.hostel;
 
 
+import com.example.hostelManagement.dto.RoomDto;
 import com.example.hostelManagement.models.hostel.Hostel;
 import com.example.hostelManagement.models.hostel.Room;
 import com.example.hostelManagement.models.user.Student;
@@ -10,6 +11,7 @@ import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
 import java.util.Optional;
 
 @Service
@@ -25,11 +27,11 @@ public class RoomService {
         int i = startRoomNo;
         while (i < startRoomNo + totalRooms) {
             Room room = new Room();
-            room.setRoom_no(i);
+            room.setRoomNo(i);
             room.setHostel(hostel);
-            room.setFloor_no(floorNo);
-            room.setTotal_seats(totalSeatsInEachRoom);
-            room.setEmpty_seats(totalSeatsInEachRoom);
+            room.setFloorNo(floorNo);
+            room.setTotalSeats(totalSeatsInEachRoom);
+            room.setEmptySeats(totalSeatsInEachRoom);
             roomRepo.save(room);
             i++;
         }
@@ -37,11 +39,11 @@ public class RoomService {
 
     public void createRoom(int floorNo, int roomNo, Hostel hostel, int totalSeatsInRoom) {
         Room room = new Room();
-        room.setRoom_no(roomNo);
+        room.setRoomNo(roomNo);
         room.setHostel(hostel);
-        room.setFloor_no(floorNo);
-        room.setTotal_seats(totalSeatsInRoom);
-        room.setEmpty_seats(totalSeatsInRoom);
+        room.setFloorNo(floorNo);
+        room.setTotalSeats(totalSeatsInRoom);
+        room.setEmptySeats(totalSeatsInRoom);
         roomRepo.save(room);
     }
 
@@ -89,5 +91,17 @@ public class RoomService {
         } else {
             throw new RuntimeException("Room not found!");
         }
+    }
+
+    public List<RoomDto> getRoomsByHostelAndFloor(Hostel hostel, Integer floorNo) {
+        return roomRepo.findByHostelAndFloorNoOrderByRoomNoAsc(hostel, floorNo).stream().map(
+                room -> new RoomDto(
+                        room.getRoomId(),
+                        room.getRoomNo(),
+                        room.getFloorNo(),
+                        room.getTotalSeats(),
+                        room.getEmptySeats()
+                )
+        ).toList();
     }
 }

@@ -2,24 +2,19 @@ package com.example.hostelManagement.service;
 
 
 import com.example.hostelManagement.constants.PaymentStatus;
+import com.example.hostelManagement.dto.FeesStaffDto;
+import com.example.hostelManagement.dto.FeesStudentDto;
 import com.example.hostelManagement.models.FeesPayment;
 import com.example.hostelManagement.models.hostel.Hostel;
 import com.example.hostelManagement.models.user.Student;
 import com.example.hostelManagement.repository.FeesPaymentRepo;
 import com.example.hostelManagement.repository.hostel.HostelRepo;
 import com.example.hostelManagement.repository.user.StudentRepo;
-import org.hibernate.tool.schema.extract.internal.SequenceInformationExtractorTiDBDatabaseImpl;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.auditing.CurrentDateTimeProvider;
 import org.springframework.stereotype.Service;
-import org.w3c.dom.stylesheets.LinkStyle;
 
-import javax.swing.text.html.Option;
-import java.sql.Time;
 import java.time.LocalDate;
-import java.time.Year;
 import java.util.Collections;
-import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 
@@ -41,7 +36,7 @@ public class FeesPaymentService {
         feesPayment.setHostel(hostelRepo.findById(hostel_id).orElse(null));
         feesPayment.setStudent(studentRepo.findById(student_id).orElse(null));
         feesPayment.setAmount(amount);
-        feesPayment.setYear(Year.now().getValue());
+        feesPayment.setYear(LocalDate.now());
         feesPaymentRepo.save(feesPayment);
     }
 
@@ -53,19 +48,17 @@ public class FeesPaymentService {
         }
     }
 
-    public List<FeesPayment> getAllPaymentsForStudent(Integer student_id) {
+    public List<FeesStudentDto> getAllPaymentsForStudent(Integer student_id) {
         Optional<Student> student = studentRepo.findById(student_id);
-        if(student.isPresent()) {
-            return student.get().getFeesPayments();
-        }
-        return Collections.emptyList();
+        return student.map(value -> value.getFeesPayments().stream().map(feesPayment -> new FeesStudentDto(feesPayment.getAmount(), feesPayment.getTransactionId(),feesPayment.getYear(), feesPayment.getPaymentStatus())).toList()).orElse(Collections.emptyList());
     }
 
-    public List<FeesPayment> getAllPaymentsForHostel(Integer hostel_id) {
+    public List<FeesStaffDto> getAllPaymentsForHostel(Integer hostel_id) {
         Optional<Hostel> hostel = hostelRepo.findById(hostel_id);
-        if(hostel.isPresent()) {
-            return hostel.get().getFeesPayments();
-        }
-        return Collections.emptyList();
+        return hostel.map(value -> value.getFeesPayments().stream().map(feesPayment -> new FeesStaffDto(feesPayment.getAmount(), feesPayment.getStudent().getName(), feesPayment.getStudent().getEmail(), feesPayment.getTransactionId(), feesPayment.getPaymentStatus())).toList()).orElse(Collections.emptyList());
+    }
+
+    public Optional<FeesPayment> getFeesPaymentById(String id) {
+        return feesPaymentRepo.findByTransactionId(id);
     }
 }

@@ -1,6 +1,5 @@
 package com.example.hostelManagement.dto;
 
-import jakarta.persistence.Column;
 import jakarta.validation.constraints.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -10,6 +9,8 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 public class HostelDto {
+
+    private Integer hostelId;
 
     @NotNull(message = "capacity must not be null")
     @Min(1)

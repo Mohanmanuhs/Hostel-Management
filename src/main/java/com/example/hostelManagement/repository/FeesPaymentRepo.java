@@ -8,5 +8,6 @@ import java.util.Optional;
 
 @Repository
 public interface FeesPaymentRepo extends JpaRepository<FeesPayment,Integer> {
+
     Optional<FeesPayment> findByTransactionId(String transactionId);
 }
