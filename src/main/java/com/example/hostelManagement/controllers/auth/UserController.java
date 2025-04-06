@@ -3,6 +3,7 @@ package com.example.hostelManagement.controllers.auth;
 
 import com.example.hostelManagement.constants.Role;
 import com.example.hostelManagement.dto.ChangePassDto;
+import com.example.hostelManagement.dto.ProfileDto;
 import com.example.hostelManagement.dto.UserLoginRequest;
 import com.example.hostelManagement.dto.UserRegisterRequest;
 import com.example.hostelManagement.models.auth.UserPrincipal;
@@ -23,6 +24,7 @@ import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.web.bind.annotation.*;
@@ -115,6 +117,13 @@ public class UserController {
         return ResponseEntity.ok("logout successful");
     }
 
+    @GetMapping("/profile")
+    public ResponseEntity<?> getProfile(@AuthenticationPrincipal UserPrincipal userDetails) {
+        String email = userDetails.getUsername();
+        User user = userService.findByEmail(email);
+        return ResponseEntity.ok(getProfileFromUser(user));
+    }
+
     @PostMapping("/changePassword")
     public ResponseEntity<?> changePassword(@RequestBody @Valid ChangePassDto changePassDto) {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
@@ -181,6 +190,15 @@ public class UserController {
         return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("bad request");
     }
 
+    private static ProfileDto getProfileFromUser(User user) {
+        ProfileDto profileDto = new ProfileDto();
+        profileDto.setEmail(user.getEmail());
+        profileDto.setName(user.getName());
+        profileDto.setAddress(user.getAddress());
+        profileDto.setPhone(user.getPhone());
+        profileDto.setRole(user.getRole());
+        return profileDto;
+    }
 
 
     private static Staff getStaff(UserRegisterRequest userRequest) {
